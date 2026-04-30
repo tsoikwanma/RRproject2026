@@ -8,9 +8,7 @@ How is Uber trip demand distributed across space and time in the New York City a
 
 ## Data Source
 
-The data comes from the public Kaggle dataset **Uber Pickups in New York City**, published by FiveThirtyEight. The dataset contains Uber pickup records in New York City, including pickup date and time, latitude, longitude, and base information.
-
-Dataset link: https://www.kaggle.com/datasets/fivethirtyeight/uber-pickups-in-new-york-city?select=uber-raw-data-sep14.csv
+The data comes from the public Kaggle dataset [**Uber Pickups in New York City**](https://www.kaggle.com/datasets/fivethirtyeight/uber-pickups-in-new-york-city?select=uber-raw-data-sep14.csv), published by FiveThirtyEight. The dataset contains Uber pickup records in New York City, including pickup date and time, latitude, longitude, and base information. [(Original Project)](https://colab.research.google.com/drive/1DWK4m2jPTA3LIZLpBz1AWM3Lb_WZhrJE?usp=sharing&fbclid=IwY2xjawRgRgRleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAEwAAEehWIpuBVHjdC6_yWHwYMFPkC1goSbzCfA840ONaTV0W87GLvcGiZ0-Nm5xdM_aem_KigbOWXRhwQQDLuu0SY_5Q#scrollTo=Lxuj6FnX0Awc)
 
 ## Planned Approach
 
@@ -32,4 +30,3 @@ It is expected to use the following libraries:
 ## Motivation
 
 Uber trip data provides a real-world example of how urban mobility changes across both space and time. By analyzing these patterns, it is hoped to have a better understanding of travel behavior in a large city and explore how data-driven methods can support transportation analysis and forecasting.
-
