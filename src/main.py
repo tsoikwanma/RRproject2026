@@ -10,8 +10,10 @@ import numpy as np
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_score, silhouette_samples
 from scipy.spatial.distance import pdist
+from yellowbrick.cluster import SilhouetteVisualizer
+from gap_statistic import OptimalK
 
 # Data preparation
 #Load the data
@@ -157,4 +159,45 @@ plt.xlabel("Number of clusters K")
 plt.ylabel("Average Dissimilarity (Distance between centers)")
 plt.title("Dissimilarity scores for different k values")
 plt.savefig(OUTPUT_DIR / "uber_nj_dissimilarity.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+# Perform KMeans clustering with a chosen number of clusters
+k = 8
+kmeans_result = KMeans(n_clusters = k, n_init = 75, random_state = 42)
+kmeans_result.fit(uber_data.loc[uber_data["train"] == True, ["Lon", "Lat"]])
+
+# Assign clusters to the training data
+uber_data.loc[uber_data["train"] == True, "cluster"] = kmeans_result.labels_
+
+plt.figure(figsize = (10, 6))
+scatter = plt.scatter(uber_data["Lon"], uber_data["Lat"],
+                      c = uber_data["cluster"], cmap = "tab10", alpha = 0.6)
+plt.colorbar(scatter, label = "Cluster")
+plt.title("Uber Trip Clusters by Location")
+plt.xlabel("Longitude")
+plt.ylabel("Latitude")
+plt.savefig(OUTPUT_DIR / "uber_nj_clusters.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+# Quality measures
+# Silhouette Index
+np.random.seed(1)
+train_sample = uber_data[uber_data["train"] == True].copy()
+train_sample = train_sample.sample(n = 10000, random_state = 1)
+
+silhouette_scores = silhouette_samples(train_sample[["Lon", "Lat"]], kmeans_result.predict(train_sample[["Lon", "Lat"]]))
+print(pd.Series(silhouette_scores).describe())
+km = KMeans(n_clusters = k, n_init = 75, random_state = 42)
+visualizer = SilhouetteVisualizer(km, colors = "tab10")
+visualizer.fit(train_sample[["Lon", "Lat"]])
+visualizer.show(outpath=OUTPUT_DIR / "uber_nj_silhouette_coefficient.png")
+
+# GAP Statistic
+# Calculate GAP statistic for KMeans clustering on the random sample
+np.random.seed(123)
+optimalK = OptimalK(n_jobs = 1)
+n_clusters = optimalK(train_sample[["Lon", "Lat"]].values, cluster_array = range(1, 11), n_refs = 100)
+print(optimalK.gap_df)
+optimalK.plot_results()
+plt.savefig(OUTPUT_DIR / "uber_nj_gap_statistic.png", dpi=300, bbox_inches="tight")
 plt.show()
