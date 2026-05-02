@@ -62,3 +62,99 @@ ax.set_xlabel("Longitude")
 ax.set_ylabel("Latitude")
 
 ax.figure.savefig(OUTPUT_DIR / "uber_nj_map.png", dpi=300, bbox_inches="tight")
+
+
+
+# K-means cluster number calculation
+# Reproducibility
+np.random.seed(123)
+
+# Randomly sample 100,000 observations from training data
+train_data = uber_data.loc[uber_data["train"] == True, ["Lat", "Lon"]]
+
+sample_locations = train_data.sample(n=100000, random_state=123)
+
+# WSS plot
+wss_values = []
+
+k_values = range(1, 11)
+
+for k in k_values:
+    kmeans = KMeans(
+        n_clusters=k,
+        n_init=75,
+        random_state=123
+    )
+    kmeans.fit(sample_locations)
+    wss_values.append(kmeans.inertia_)
+
+# Plot WSS values to visualize the elbow method
+plt.figure()
+plt.plot(k_values, wss_values, marker="o")
+plt.xlabel("Number of clusters K")
+plt.ylabel("Total within-clusters sum of squares")
+plt.title("Elbow Method")
+plt.savefig(OUTPUT_DIR / "uber_nj_elbow.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+# Reproducibility
+np.random.seed(123)
+
+# Randomly sample 10,000 observations from training data
+train_data1 = uber_data.loc[uber_data["train"] == True,["Lat", "Lon"]]
+
+sample_locations1 = train_data1.sample(n=10000, random_state=123)
+
+silhouette_scores = []
+
+for k in range(2, 11):
+    kmeans_result = KMeans(
+        n_clusters=k,
+        n_init=75,
+        random_state=123
+    )
+
+    cluster_labels = kmeans_result.fit_predict(sample_locations1)
+
+    avg_sil_width = silhouette_score(
+        sample_locations1,
+        cluster_labels
+    )
+
+    silhouette_scores.append(avg_sil_width)
+
+# Plot average silhouette scores
+plt.figure()
+plt.plot(range(2, 11), silhouette_scores, marker="o")
+plt.xlabel("Number of clusters K")
+plt.ylabel("Average Silhouette score")
+plt.title("Silhouette scores for different K values")
+plt.savefig(OUTPUT_DIR / "uber_nj_silhouette.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+print(silhouette_scores)
+
+
+dissimilarity_scores = []
+
+for k in range(2, 11):
+    kmeans_result = KMeans(
+        n_clusters=k,
+        n_init=75,
+        random_state=123
+    )
+
+    kmeans_result.fit(sample_locations)
+    cluster_centers = kmeans_result.cluster_centers_
+    distances_between_clusters = pdist(cluster_centers)
+    avg_dissimilarity = np.mean(distances_between_clusters)
+    dissimilarity_scores.append(avg_dissimilarity)
+
+# Plot dissimilarity scores
+plt.figure()
+plt.plot(range(2, 11), dissimilarity_scores, marker="o")
+plt.xlabel("Number of clusters K")
+plt.ylabel("Average Dissimilarity (Distance between centers)")
+plt.title("Dissimilarity scores for different k values")
+plt.savefig(OUTPUT_DIR / "uber_nj_dissimilarity.png", dpi=300, bbox_inches="tight")
+plt.show()
