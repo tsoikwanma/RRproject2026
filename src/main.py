@@ -1,6 +1,6 @@
 from pathlib import Path
 
-PROJECT_ROOT = Path(_file_).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
 OUTPUT_DIR = PROJECT_ROOT / "output"
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -9,9 +9,13 @@ import pandas as pd
 import numpy as np
 import geopandas as gpd
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from scipy.spatial.distance import pdist
 
+# Data preparation
 #Load the data
-uber_data = pd.read_csv("uber-raw-data-sep14.csv")
+uber_data = pd.read_csv(DATA_DIR / "uber-raw-data-sep14.csv")
 uber_data = uber_data.dropna()
 locations = uber_data[['Lat', 'Lon']]
 
@@ -57,4 +61,4 @@ ax.set_title("Uber Trip Locations in New Jersey")
 ax.set_xlabel("Longitude")
 ax.set_ylabel("Latitude")
 
-plt.savefig(OUTPUT_DIR / "uber_nj_map.png", dpi=300, bbox_inches="tight")
+ax.figure.savefig(OUTPUT_DIR / "uber_nj_map.png", dpi=300, bbox_inches="tight")
