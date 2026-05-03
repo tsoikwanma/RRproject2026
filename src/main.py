@@ -198,6 +198,16 @@ np.random.seed(123)
 optimalK = OptimalK(n_jobs = 1)
 n_clusters = optimalK(train_sample[["Lon", "Lat"]].values, cluster_array = range(1, 11), n_refs = 100)
 print(optimalK.gap_df)
-optimalK.plot_results()
-plt.savefig(OUTPUT_DIR / "uber_nj_gap_statistic.png", dpi=300, bbox_inches="tight")
+gap_df = optimalK.gap_df
+optimalK.gap_df.to_csv(OUTPUT_DIR / "uber_nj_gap_statistic.csv", index=False)
+plt.figure(figsize = (8, 6))
+plt.errorbar(gap_df["n_clusters"], gap_df["gap_value"],
+             yerr = gap_df["sk"], fmt = 'o-', color='black',
+             ecolor = 'red', capsize = 4, markersize = 4)
+plt.title("Gap Values by Cluster Count")
+plt.xlabel("k")
+plt.ylabel("Gap$_k$")
+plt.xticks(range(1, 11, 2))
+plt.grid(False)
+plt.savefig(OUTPUT_DIR / "uber_nj_gap_statistic.png", dpi = 300, bbox_inches = "tight")
 plt.show()
