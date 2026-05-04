@@ -72,12 +72,19 @@ The data comes from the public Kaggle dataset [**Uber Pickups in New York City**
 In the repository, the data is present under data\uber-raw-data-sep14.csv
 
 ## Repository structure
+
 RRproject2026
+
 ├── README.md
+
 ├── data/
+
 ├── src/
+
 ├── output/
+
 ├── requirements.txt
+
 └── .gitignore
 
 - The data folder contains the uber-raw-data-sep14.csv dataset used in the analysis.
