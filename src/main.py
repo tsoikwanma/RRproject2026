@@ -14,6 +14,7 @@ from sklearn.metrics import silhouette_score, silhouette_samples
 from scipy.spatial.distance import pdist
 from yellowbrick.cluster import SilhouetteVisualizer
 from gap_statistic import OptimalK
+from matplotlib.colors import hsv_to_rgb
 
 # Data preparation
 #Load the data
@@ -210,4 +211,140 @@ plt.ylabel("Gap$_k$")
 plt.xticks(range(1, 11, 2))
 plt.grid(False)
 plt.savefig(OUTPUT_DIR / "uber_nj_gap_statistic.png", dpi = 300, bbox_inches = "tight")
+plt.show()
+
+# Analyze cluster centers by time
+# Count trips by cluster and hour, and ungroup the result for train data only
+hourly_counts = (
+    uber_data[uber_data["train"] == True]   # filter(train == TRUE)
+    .groupby(["cluster", "hour"])           # group_by(cluster, Hour)
+    .size()                                 # n()
+    .reset_index(name="trips")              # summarize + drop grouping
+)
+
+# Plot the hourly trip counts by cluster
+plt.figure()
+
+for cluster_value in hourly_counts["cluster"].unique():
+    subset = hourly_counts[hourly_counts["cluster"] == cluster_value]
+    plt.plot(subset["hour"], subset["trips"], label=str(cluster_value))
+
+plt.title("Hourly Trip Counts by Cluster")
+plt.xlabel("Hour")
+plt.ylabel("Number of Trips")
+plt.legend(title="Cluster")
+
+plt.savefig(OUTPUT_DIR / "uber_nk_hourly_trip_counts.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+# Analyze the cluster centers by date
+# Count trips by cluster and Date
+daily_counts = (
+    uber_data[uber_data["train"] == True]   # filter(train == TRUE)
+    .groupby(["cluster", "date"])           # group_by(cluster, Date)
+    .size()                                 # n()
+    .reset_index(name="trips")              # summarize + drop grouping
+)
+
+# Ensure consistent ordering (important for matching ggplot output)
+daily_counts = daily_counts.sort_values(["date", "cluster"])
+
+# Prepare for grouped (dodged) bar plot
+clusters = sorted(daily_counts["cluster"].unique())
+dates = sorted(daily_counts["date"].unique())
+
+x = np.arange(len(dates))  # positions for Date
+width = 0.8 / len(clusters)  # bar width (like position = "dodge")
+
+plt.figure()
+
+for i, cluster_value in enumerate(clusters):
+    subset = daily_counts[daily_counts["cluster"] == cluster_value]
+
+    # Align values with all dates (important for exact match)
+    subset = subset.set_index("date").reindex(dates, fill_value=0).reset_index()
+
+    plt.bar(
+        x + i * width,
+        subset["trips"],
+        width=width,
+        label=str(cluster_value)
+    )
+
+plt.xticks(x + width * (len(clusters)-1)/2, dates)
+plt.title("Daily Trip Counts by Cluster")
+plt.xlabel("Day of the Week")
+plt.ylabel("Number of Trips")
+plt.legend(title="Cluster")
+
+plt.savefig(OUTPUT_DIR / "uber_nj_daily_trip_counts.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+# Forecasting
+# Predict clusters for the test data
+pred_test = kmeans_result.predict(
+    uber_data.loc[uber_data["train"] == False, ["Lon", "Lat"]]
+)
+
+if uber_data["cluster"].min() == 1:
+    pred_test = pred_test + 1
+
+uber_data.loc[uber_data["train"] == False, "cluster"] = pred_test
+
+# Equivalent of R rainbow(k)
+cluster_colors = hsv_to_rgb(
+    np.column_stack([
+        np.linspace(0, 1, k, endpoint=False),
+        np.ones(k),
+        np.ones(k)
+    ])
+)
+
+# Plot training data on a separate graph
+train_data = uber_data[uber_data["train"] == True]
+
+plt.figure()
+plt.scatter(
+    train_data["Lon"],
+    train_data["Lat"],
+    c=[cluster_colors[int(cluster) - 1] for cluster in train_data["cluster"]],
+    marker="o",
+    s=20
+)
+
+plt.xlabel("Lon")
+plt.ylabel("Lat")
+plt.title("KMeans Clustering on Uber Data: Training Data (Circles)")
+
+for i in range(k):
+    plt.scatter([], [], color=cluster_colors[i], marker="o", label=f"Cluster {i+1}")
+
+plt.legend(title="Training Clusters", loc="upper right")
+
+plt.savefig(OUTPUT_DIR / "uber_nj_training_clusters.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+
+# Plot test data on a separate graph
+test_data = uber_data[uber_data["train"] == False]
+
+plt.figure()
+plt.scatter(
+    test_data["Lon"],
+    test_data["Lat"],
+    c=[cluster_colors[int(cluster) - 1] for cluster in test_data["cluster"]],
+    marker="s",
+    s=30
+)
+
+plt.xlabel("Lon")
+plt.ylabel("Lat")
+plt.title("KMeans Clustering on Uber Data: Test Data (Squares)")
+
+for i in range(k):
+    plt.scatter([], [], color=cluster_colors[i], marker="s", label=f"Cluster {i+1}")
+
+plt.legend(title="Test Clusters", loc="upper right")
+
+plt.savefig(OUTPUT_DIR / "uber_nj_test_clusters.png", dpi=300, bbox_inches="tight")
 plt.show()
