@@ -22,7 +22,7 @@ uber_data = pd.read_csv(DATA_DIR / "uber-raw-data-sep14.csv")
 uber_data = uber_data.dropna()
 locations = uber_data[['Lat', 'Lon']]
 
-#create columns Date and Hour
+# Create columns Date and Hour for time analysis
 uber_data['Date/Time'] = pd.to_datetime(uber_data['Date/Time'])
 uber_data['date'] = uber_data['Date/Time'].dt.date
 uber_data['hour'] = uber_data['Date/Time'].dt.hour
@@ -40,7 +40,7 @@ uber_data.loc[train_indices, "train"] = True
 print("Number of training samples:", len(uber_data[uber_data["train"] == True]), "\n")
 print("Number of test samples:", len(uber_data[uber_data["train"] == False]), "\n")
 
-#Visualize the data on the map
+# Visualize the data on the map
 # The map of the USA
 path = "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json"
 map_data = gpd.read_file(path)
@@ -51,12 +51,12 @@ lon_max = -73.0
 lat_min = 40.2
 lat_max = 41.25
 
-#Creating geo data from uber_data
+# Creating geo data from uber_data
 uber_data_map = gpd.GeoDataFrame(uber_data, geometry=gpd.points_from_xy(uber_data["Lon"], uber_data["Lat"])
 )
 # Plot the map of the USA
 ax = map_data.plot(color = "#e5e5e5")
-# Plot the Uber data points within New Jersey
+# Plot the Uber data points within New Jersey state
 uber_data_map.plot(ax = ax, color = "blue", alpha = 0.01, markersize = 0.5)
 ax.set_xlim(lon_min, lon_max)
 ax.set_ylim(lat_min, lat_max)
@@ -67,19 +67,22 @@ ax.set_ylabel("Latitude")
 ax.figure.savefig(OUTPUT_DIR / "uber_nj_map.png", dpi=300, bbox_inches="tight")
 
 
+# Discover the number of clusters of Uber data based on locations (longitude and latitude)
 
-# K-means cluster number calculation
+# K-means alogorithm chosen because it is computationally efficient and suitable for spacial data
+
+# Determining the optimal number of clusters
+
 # Reproducibility
 np.random.seed(123)
 
 # Randomly sample 100,000 observations from training data
 train_data = uber_data.loc[uber_data["train"] == True, ["Lat", "Lon"]]
-
 sample_locations = train_data.sample(n=100000, random_state=123)
 
 # WSS plot
+# The firt way to assess the optimal number of clusters is to plot the total within-clusters sum of squares (WSS) for different values of K and look for an "elbow" in the plot where the rate of decrease sharply changes.
 wss_values = []
-
 k_values = range(1, 11)
 
 for k in k_values:
@@ -100,14 +103,14 @@ plt.title("Elbow Method")
 plt.savefig(OUTPUT_DIR / "uber_nj_elbow.png", dpi=300, bbox_inches="tight")
 plt.show()
 
-# Reproducibility
-np.random.seed(123)
 
+np.random.seed(123)
 # Randomly sample 10,000 observations from training data
 train_data1 = uber_data.loc[uber_data["train"] == True,["Lat", "Lon"]]
-
 sample_locations1 = train_data1.sample(n=10000, random_state=123)
 
+# Silhouette score
+# Another way to determine the optimal number of clusters is to calculate the silhouette score for different values of K. The silhouette score measures how similar an object is to its own cluster compared to other clusters. A higher silhouette score indicates better-defined clusters.
 silhouette_scores = []
 
 for k in range(2, 11):
@@ -138,6 +141,8 @@ plt.show()
 print(silhouette_scores)
 
 
+# Dissimilarity scores
+# Finally, we can also calculate the average distance between cluster centers for different values of K. A higher average distance indicates more distinct clusters.
 dissimilarity_scores = []
 
 for k in range(2, 11):
@@ -162,6 +167,9 @@ plt.title("Dissimilarity scores for different k values")
 plt.savefig(OUTPUT_DIR / "uber_nj_dissimilarity.png", dpi=300, bbox_inches="tight")
 plt.show()
 
+
+# K-means clustering
+# Based on the three plots, we decide to choose K = 8 clusters for the final KMeans clustering, as it provides a good balance between cluster separation and compactness.
 # Perform KMeans clustering with a chosen number of clusters
 k = 8
 kmeans_result = KMeans(n_clusters = k, n_init = 75, random_state = 42)
@@ -170,6 +178,7 @@ kmeans_result.fit(uber_data.loc[uber_data["train"] == True, ["Lon", "Lat"]])
 # Assign clusters to the training data
 uber_data.loc[uber_data["train"] == True, "cluster"] = kmeans_result.labels_
 
+# Plotting the clusters on the map
 plt.figure(figsize = (10, 6))
 scatter = plt.scatter(uber_data["Lon"], uber_data["Lat"],
                       c = uber_data["cluster"], cmap = "tab10", alpha = 0.6)
@@ -180,7 +189,7 @@ plt.ylabel("Latitude")
 plt.savefig(OUTPUT_DIR / "uber_nj_clusters.png", dpi=300, bbox_inches="tight")
 plt.show()
 
-# Quality measures
+# Evaluation of clusters -quality measures
 # Silhouette Index
 np.random.seed(1)
 train_sample = uber_data[uber_data["train"] == True].copy()
@@ -192,6 +201,8 @@ km = KMeans(n_clusters = k, n_init = 75, random_state = 42)
 visualizer = SilhouetteVisualizer(km, colors = "tab10")
 visualizer.fit(train_sample[["Lon", "Lat"]])
 visualizer.show(outpath=OUTPUT_DIR / "uber_nj_silhouette_coefficient.png")
+# The clustering shows generally weak separation, with a mean silhouette score around -0.097, where most clusters have near-zero or slightly negative values, indicating that many points lie close to cluster boundaries and could benefit from improved grouping.
+
 
 # GAP Statistic
 # Calculate GAP statistic for KMeans clustering on the random sample
@@ -212,6 +223,7 @@ plt.xticks(range(1, 11, 2))
 plt.grid(False)
 plt.savefig(OUTPUT_DIR / "uber_nj_gap_statistic.png", dpi = 300, bbox_inches = "tight")
 plt.show()
+# The GAP statistic (using the “first SE max” method) suggests an optimal cluster count of 1, indicating that the data likely has a weak or subtle clustering structure, with additional clusters providing only limited improvement in separation.
 
 # Analyze cluster centers by time
 # Count trips by cluster and hour, and ungroup the result for train data only
@@ -236,6 +248,8 @@ plt.legend(title="Cluster")
 
 plt.savefig(OUTPUT_DIR / "uber_nk_hourly_trip_counts.png", dpi=300, bbox_inches="tight")
 plt.show()
+# Clusters 1 and 2 show the highest activity with clear peaks around typical commute hours, while Cluster 3 has a more even distribution of trips throughout the day. Clusters 4-8 exhibit generally lower and more consistent activity levels.
+
 
 # Analyze the cluster centers by date
 # Count trips by cluster and Date
@@ -279,6 +293,7 @@ plt.legend(title="Cluster")
 
 plt.savefig(OUTPUT_DIR / "uber_nj_daily_trip_counts.png", dpi=300, bbox_inches="tight")
 plt.show()
+# Clusters 1 and 2 consistently have the highest daily trip counts -often peaking on weekdays - indicating they capture the strongest and more variable demand patterns.
 
 # Forecasting
 # Predict clusters for the test data
@@ -348,3 +363,4 @@ plt.legend(title="Test Clusters", loc="upper right")
 
 plt.savefig(OUTPUT_DIR / "uber_nj_test_clusters.png", dpi=300, bbox_inches="tight")
 plt.show()
+# The data from the Test dataset was correctly assigned to clusters based on locations. This shows that the model is well-suited for predicting future patterns.
