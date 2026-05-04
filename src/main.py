@@ -246,7 +246,7 @@ plt.xlabel("Hour")
 plt.ylabel("Number of Trips")
 plt.legend(title="Cluster")
 
-plt.savefig(OUTPUT_DIR / "uber_nk_hourly_trip_counts.png", dpi=300, bbox_inches="tight")
+plt.savefig(OUTPUT_DIR / "uber_nj_hourly_trip_counts.png", dpi=300, bbox_inches="tight")
 plt.show()
 # Clusters 1 and 2 show the highest activity with clear peaks around typical commute hours, while Cluster 3 has a more even distribution of trips throughout the day. Clusters 4-8 exhibit generally lower and more consistent activity levels.
 
