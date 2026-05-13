@@ -61,15 +61,22 @@ python src/main.py
 ```
 
 ## Expected output
-The first section generates a map of New Jersey state, including the Uber data points in the figure "uber_nj_map.png". Figure "uber_nj_elbow.png shows the WSS values using elbow method. The next figure, "uber_nj_silhouette.png",  represents the silhouette scores for different numbers of clusters. Figure "uber_nj_dissimilarity.png" visualises the dissimilarity between different numbers of clusters. 
-Next steps include visualising the clusters on the map in figure "uber_nj_clusters.png" and evaluation of clusters based on the quality measures in figure "uber_nj_silhouette_coefficient.png". Figure "uber_nj_gap_statistic.png" and table "uber_nj_gap_statistic.csv" represent the calculated GAP statistic for clustering. 
-Next steps include hourly trip counts for each cluster in figure "uber_nk_hourly_trip_counts.png" and the count of daily trips in figure "uber_nj_daily_trip_counts.png". 
-The last figures show plots visualising training and test data in figures "uber_nj_training_clusters.png" and "uber_nj_test_clusters.png".
-The whole execution time is expected at approximately 3-5 minutes.
+- The first section generates a map of New Jersey state, including the Uber data points in the figure "uber_nj_map.png".
+- Figure "uber_nj_elbow.png shows the WSS values using elbow method.
+- The next figure, "uber_nj_silhouette.png",  represents the silhouette scores for different numbers of clusters.
+- Figure "uber_nj_dissimilarity.png" visualises the dissimilarity between different numbers of clusters.
+- Next steps include visualising the clusters on the map in figure "uber_nj_clusters.png" and evaluation of clusters based on the quality measures in figure "uber_nj_silhouette_coefficient.png". Figure "uber_nj_gap_statistic.png" and table "uber_nj_gap_statistic.csv" represent the calculated GAP statistic for clustering.
+- Next steps include hourly trip counts for each cluster in figure "uber_nk_hourly_trip_counts.png" and the count of daily trips in figure "uber_nj_daily_trip_counts.png".
+- The last figures show plots visualising training and test data in figures "uber_nj_training_clusters.png" and "uber_nj_test_clusters.png".
+
+- The whole execution time is expected at approximately 3-5 minutes.
 
 ## Data
-The data comes from the public Kaggle dataset [**Uber Pickups in New York City**](https://www.kaggle.com/datasets/fivethirtyeight/uber-pickups-in-new-york-city?select=uber-raw-data-sep14.csv), published by FiveThirtyEight. The dataset contains Uber pickup records in New York City, including pickup date and time, latitude, longitude, and base information. [(Original Project)](https://colab.research.google.com/drive/1DWK4m2jPTA3LIZLpBz1AWM3Lb_WZhrJE?usp=sharing&fbclid=IwY2xjawRgRgRleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAEwAAEehWIpuBVHjdC6_yWHwYMFPkC1goSbzCfA840ONaTV0W87GLvcGiZ0-Nm5xdM_aem_KigbOWXRhwQQDLuu0SY_5Q#scrollTo=Lxuj6FnX0Awc)
-In the repository, the data is present under data\uber-raw-data-sep14.csv
+- The data comes from the public Kaggle dataset [**Uber Pickups in New York City**](https://www.kaggle.com/datasets/fivethirtyeight/uber-pickups-in-new-york-city?select=uber-raw-data-sep14.csv), published by FiveThirtyEight. 
+- The dataset contains Uber pickup records in New York City, including pickup date and time, latitude, longitude, and base information.
+- In the repository, the data is present under data\uber-raw-data-sep14.csv
+
+- Link to the original R project that is being reproduced: [(Original Project)](https://colab.research.google.com/drive/1DWK4m2jPTA3LIZLpBz1AWM3Lb_WZhrJE?usp=sharing&fbclid=IwY2xjawRgRgRleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAEwAAEehWIpuBVHjdC6_yWHwYMFPkC1goSbzCfA840ONaTV0W87GLvcGiZ0-Nm5xdM_aem_KigbOWXRhwQQDLuu0SY_5Q#scrollTo=Lxuj6FnX0Awc)
 
 ## Repository structure
 
