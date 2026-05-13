@@ -8,7 +8,7 @@ How is Uber trip demand distributed across space and time in the New York and Ne
 
 ## Approach
 The original project was developed in R and is available under https://colab.research.google.com/drive/1DWK4m2jPTA3LIZLpBz1AWM3Lb_WZhrJE?usp=sharing#scrollTo=iAa_MnRh0slX.
-The project was reimplemented in Python and includes data cleaning, feature extraction (hour and date), and a 95%–5% train–test split. K-means clustering is applied to pickup coordinates, with the number of clusters selected using the elbow method, silhouette scores, and dissimilarity measures (final choice: K = 8). Cluster quality is evaluated using silhouette analysis and the GAP statistic, and temporal patterns are examined through hourly and daily trip aggregations. The trained model is then applied to the test set to assess how well the clustering generalizes.
+The project was reimplemented in Python and includes data cleaning, feature extraction (hour and date), and a 95%–5% train–test split. K-means clustering is applied to pick up coordinates, with the number of clusters selected using the elbow method, silhouette scores, and dissimilarity measures (final choice: K = 8). Cluster quality is evaluated using silhouette analysis and the GAP statistic, and temporal patterns are examined through hourly and daily trip aggregations. The trained model is then applied to the test set to assess how well the clustering generalizes.
 
 ## Language / Tools
 The language used in the project is **Python**.
@@ -62,14 +62,14 @@ python src/main.py
 
 ## Expected output
 - The first section generates a map of New Jersey state, including the Uber data points in the figure "uber_nj_map.png".
-- Figure "uber_nj_elbow.png shows the WSS values using elbow method.
+- Figure "uber_nj_elbow.png" shows the WSS values using the elbow method.
 - The next figure, "uber_nj_silhouette.png",  represents the silhouette scores for different numbers of clusters.
 - Figure "uber_nj_dissimilarity.png" visualises the dissimilarity between different numbers of clusters.
 - Next steps include visualising the clusters on the map in figure "uber_nj_clusters.png" and evaluation of clusters based on the quality measures in figure "uber_nj_silhouette_coefficient.png". Figure "uber_nj_gap_statistic.png" and table "uber_nj_gap_statistic.csv" represent the calculated GAP statistic for clustering.
 - Next steps include hourly trip counts for each cluster in figure "uber_nk_hourly_trip_counts.png" and the count of daily trips in figure "uber_nj_daily_trip_counts.png".
 - The last figures show plots visualising training and test data in figures "uber_nj_training_clusters.png" and "uber_nj_test_clusters.png".
 
-- The whole execution time is expected at approximately 3-5 minutes.
+- The whole execution time is expected to be approximately 3-5 minutes.
 
 ## Data
 - The data comes from the public Kaggle dataset [**Uber Pickups in New York City**](https://www.kaggle.com/datasets/fivethirtyeight/uber-pickups-in-new-york-city?select=uber-raw-data-sep14.csv), published by FiveThirtyEight. 
@@ -90,13 +90,15 @@ RRproject2026
 
 ├── output/
 
+├── RR Uber project.pdf
+
 ├── requirements.txt
 
 └── .gitignore
 
 - The data folder contains the uber-raw-data-sep14.csv dataset used in the analysis.
 - The src folder contains a single script (main.py) because each section depends on variables and data produced in earlier steps, making it easiest to reproduce the full analysis within one continuous workflow.
-- The ouptut folder contains the results of the analysis including plots and a dataframe:
+- The output folder contains the results of the analysis, including plots and a dataframe:
   1. EDA map of Uber trips - uber_nj_map.png
   2. Plots for calculating the optimal number of clusters - uber_nj_elbow.png, uber_nj_silhouette.png, uber_nj_dissimilarity.png
   3. Plot of clusters - uber_nj_clusters.png
