@@ -35,7 +35,7 @@ Uber trip data provides a real-world example of how urban mobility changes acros
 Please follow the instructions below to create a virtual environment and install the required Python dependencies.
 ### macOS / Linux
 ``` 
-git clone [<repository-url>](https://github.com/tsoikwanma/RRproject2026.git) # Clone the repository
+git clone https://github.com/tsoikwanma/RRproject2026.git # Clone the repository
 cd <repository-folder>
 
 python3 -m venv .venv # Create a virtual environment
@@ -45,7 +45,7 @@ pip install -r requirements.txt # Install required dependencies
 ```
 ### Windows
 ```
-git clone [<repository-url>](https://github.com/tsoikwanma/RRproject2026.git) # Clone the repository
+git clone https://github.com/tsoikwanma/RRproject2026.git # Clone the repository
 cd <repository-folder>
 
 python -m venv .venv # Create a virtual environment
